@@ -1,29 +1,29 @@
 ARG BASE=ubuntu/xenial
 FROM ${BASE}
 
-ARG USER=dpike
+ARG USER=user
 
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 # Install developer dependencies
 RUN apt-get update
 
-RUN apt-get install -y man zsh unzip dialog wget sudo curl git gdb unzip \
-    iputils-ping locales silversearcher-ag nmap openssh-server vim
+RUN apt-get install -y man zsh unzip dialog wget sudo curl git unzip \
+    iputils-ping locales silversearcher-ag nmap vim
 
 RUN apt-get install -y \
-    build-essential \
-    software-properties-common \
-    libtool \
     autoconf \
+    build-essential \
+    ccache \
     cmake \
     gdb \
-    ccache \
+    libtool \
     ninja-build \
-    python-pip \
-    python-setuptools \
     python-defusedxml \
     python-netifaces
+    python-pip \
+    python-setuptools \
+    software-properties-common \
 
 # Install git-lfs for large file support
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
@@ -31,7 +31,7 @@ RUN apt-get install -y git-lfs
 
 # Add a user to the system
 RUN useradd --create-home --shell /bin/zsh -G sudo ${USER}
-RUN echo "${USER}:letmein" | chpasswd
+RUN echo "${USER}:ubuntu" | chpasswd
 
 # Generate the locale
 RUN locale-gen en_US.UTF-8  
@@ -47,6 +47,7 @@ RUN GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone https://github.c
 RUN cd /home/${USER}/ && ./dotfiles/setup_dotfiles.sh
 
 USER root
+# Set temp password to expire
 RUN passwd --expire ${USER}
 
 USER ${USER}
