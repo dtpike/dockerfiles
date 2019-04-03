@@ -9,21 +9,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 RUN apt-get update
 
 RUN apt-get install -y man zsh unzip dialog wget sudo curl git unzip \
-    iputils-ping locales silversearcher-ag nmap vim
-
-RUN apt-get install -y \
-    autoconf \
-    build-essential \
-    ccache \
-    cmake \
-    gdb \
-    libtool \
-    ninja-build \
-    python-defusedxml \
-    python-netifaces
-    python-pip \
-    python-setuptools \
-    software-properties-common \
+    iputils-ping locales vim-nox cmake build-essential python3-dev
 
 # Install git-lfs for large file support
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
@@ -40,11 +26,16 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en  
 ENV LC_ALL en_US.UTF-8
 
-# Install dotfiles
+# Install essentials
+# While we're root user install dev essentials
+RUN GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone https://github.com/dtpike/setup_scripts.git /home/${USER}/setup_scripts
+RUN chown ${USER}:${USER} /home/${USER}/setup_scripts
+RUN /home/${USER}/setup_scripts/install_dev_essentials.sh
+
 USER ${USER}
+# Install dotfiles
 RUN GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone https://github.com/dtpike/dotfiles.git /home/${USER}/dotfiles
-# Dotfiles need to be ran from the home directory
-RUN cd /home/${USER}/ && ./dotfiles/setup_dotfiles.sh
+RUN cd /home/${USER} && ./dotfiles/setup_dotfiles.sh
 
 USER root
 # Set temp password to expire
