@@ -6,10 +6,8 @@ ARG USER=user
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 # Install developer dependencies
-RUN apt-get update
-
-RUN apt-get install -y man zsh unzip dialog wget sudo curl git unzip \
-    iputils-ping locales vim-nox cmake build-essential python3-dev
+RUN apt-get update \
+    && apt-get install -y man zsh unzip dialog wget sudo curl git unzip iputils-ping locales vim-nox cmake build-essential python3-dev
 
 # Install git-lfs for large file support
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
