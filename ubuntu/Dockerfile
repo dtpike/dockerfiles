@@ -74,6 +74,23 @@ RUN git clone https://github.com/neovim/neovim && \
     make CMAKE_BUILD_TYPE=RelWithDebInfo && \
     make install
 
+# Ouster dependencies
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
+    apt install -y libjsoncpp-dev \
+    libeigen3-dev \
+    libcurl4-openssl-dev \
+    libtins-dev \
+    libpcap-dev \
+    libglfw3-dev \
+    libglew-dev \
+    libspdlog-dev
+
+# Install flatbuf
+RUN git clone https://github.com/google/flatbuffers.git && \
+    cd flatbuffers && \
+    cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DFLATBUFFERS_BUILD_TESTS=OFF -DFLATBUFFERS_BUILD_FLATLIB=OFF && \
+    ninja && ninja install
+
 # Install dotfiles
 USER ${USER}
 RUN git clone https://github.com/dtpike/dotfiles.git /home/${USER}/dotfiles && \
