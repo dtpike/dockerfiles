@@ -83,13 +83,20 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
     libpcap-dev \
     libglfw3-dev \
     libglew-dev \
-    libspdlog-dev
+    libspdlog-dev \
+    libpng-dev
 
 # Install flatbuf
 RUN git clone https://github.com/google/flatbuffers.git && \
     cd flatbuffers && \
     cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DFLATBUFFERS_BUILD_TESTS=OFF -DFLATBUFFERS_BUILD_FLATLIB=OFF && \
     ninja && ninja install
+
+# Install gtest
+RUN git clone https://github.com/google/googletest.git -b v1.14.0 && \
+    cd googletest && \
+    mkdir build && cd build && \
+    cmake .. -DBUILD_GMOCK=OFF && make && make install
 
 # Install dotfiles
 USER ${USER}
