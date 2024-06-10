@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.2
 ARG DISTRO=ubuntu
-ARG DISTRO_VERSION=22.04
+ARG DISTRO_VERSION=20.04
 FROM ${DISTRO}:${DISTRO_VERSION}
 
 ARG USER=user
@@ -66,13 +66,16 @@ RUN groupadd --gid ${GID} docker && \
     ${USER}
 
 # Enable passwordless sudo
-RUN echo "user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN echo "${USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Install neovim
 RUN git clone https://github.com/neovim/neovim && \
     cd neovim && \
     make CMAKE_BUILD_TYPE=RelWithDebInfo && \
     make install
+
+# Install conan
+RUN pip3 install conan==2.0.13
 
 # Ouster dependencies
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
